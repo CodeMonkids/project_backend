@@ -1,23 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  validateEmail,
+  validatePassword,
+  validateName,
+} from './validation.utils';
 
 @Injectable()
 export class UserService {
   signup(userData: User) {
-    const { Password, email, name, password, id } = userData;
-    const passwordCheckPatton =
-      /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-za-z0-9\-]+/;
-    if (passwordCheckPatton.test(email) === false) return false;
+    const { password, email, name } = userData;
 
-    function checkPassword(str: string): boolean {
-      const hasUpperCase = /[A-Z]/.test(str);
-      const hasNumber = /\d/.test(str);
-      const hasSpecialCharacter = /[!@#$%^&*(),.?":{}|<>]/.test(str);
-
-      return hasUpperCase && hasNumber && hasSpecialCharacter;
-    }
-
-    if (!checkPassword(password)) return false;
-    if (name.length > 16) return false;
+    if (!validateEmail(email))
+      throw new BadRequestException('이메일이 유효하지 않습니다.');
+    if (!validatePassword(password))
+      throw new BadRequestException('비밀번호가 유효하지 않습니다.');
+    if (!validateName(name))
+      throw new BadRequestException('이름이 유효하지 않습니다.');
 
     console.log(userData);
     return true;
