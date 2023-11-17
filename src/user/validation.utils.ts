@@ -2,7 +2,7 @@ export const reg = {
   hasUpperCase: new RegExp(/[A-Z]/),
   hasNumber: new RegExp(/\d/),
   hasSpecialCharacter: new RegExp(/[!@#$%^&*(),.?":{}|<>]/),
-  emailCheck: new RegExp(/^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-za-z]{2,}$/),
+  emailCheck: new RegExp(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/),
 };
 
 export const validateEmail = (email: string): boolean => {
