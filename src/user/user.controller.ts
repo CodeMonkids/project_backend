@@ -11,7 +11,12 @@ export class UserController {
   }
 
   @Post('signup')
-  postsignp(@Body() userData) {
+  postsignup(@Body() userData) {
     return this.userService.signup(userData);
+  }
+
+  @Post('login')
+  postlogin(@Body() loginData) {
+    return this.userService.login(loginData);
   }
 }
