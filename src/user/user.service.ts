@@ -24,16 +24,16 @@ export class UserService {
     if (!validateName(name))
       throw new BadRequestException('Please enter a valid name.');
     this.users.push(userData);
-    return true;
+    return { messege: 'signup success' };
   }
 
   login(loginData: { email: string; password: string }) {
     const { email, password } = loginData;
     const currentUser = this.users.find((user) => user.email === email);
-    if (!currentUser) return new NotFoundException('계정을 찾을 수 없습니다.');
+    if (!currentUser) return new NotFoundException('Email not found.');
     if (currentUser.password !== password)
-      return new UnauthorizedException('비밀번호가 틀렸습니다.');
-    return true;
+      return new UnauthorizedException('Password is not correct');
+    return { messege: 'login success' };
   }
 
   getroot(): string {
