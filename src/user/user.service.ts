@@ -18,11 +18,11 @@ export class UserService {
   signup(userData: User) {
     const { password, email, name } = userData;
     if (!validateEmail(email))
-      throw new BadRequestException('이메일이 유효하지 않습니다.');
+      throw new BadRequestException('Please enter a valid email address.');
     if (!validatePassword(password))
-      throw new BadRequestException('비밀번호가 유효하지 않습니다.');
+      throw new BadRequestException('Please enter a valid password.');
     if (!validateName(name))
-      throw new BadRequestException('이름이 유효하지 않습니다.');
+      throw new BadRequestException('Please enter a valid name.');
     this.users.push(userData);
     return true;
   }

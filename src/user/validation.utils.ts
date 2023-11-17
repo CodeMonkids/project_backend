@@ -11,10 +11,8 @@ export const validateEmail = (email: string): boolean => {
 
 export const validatePassword = (password: string) => {
   const { hasNumber, hasSpecialCharacter, hasUpperCase } = reg;
-  const regTests = [hasNumber, hasSpecialCharacter, hasUpperCase].map((reg) =>
-    reg.test(password),
-  );
-  return regTests.every((test) => test === true);
+  const regTests = [hasNumber, hasSpecialCharacter, hasUpperCase];
+  return regTests.every((reg) => reg.test(password));
 };
 
 export const validateName = (name: string) => {
