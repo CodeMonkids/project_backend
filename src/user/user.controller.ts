@@ -10,6 +10,11 @@ export class UserController {
     return this.userService.getroot();
   }
 
+  @Get('alluser')
+  getAllusers() {
+    return this.userService.getAll();
+  }
+
   @Post('signup')
   postsignup(@Body() userData) {
     return this.userService.signup(userData);
