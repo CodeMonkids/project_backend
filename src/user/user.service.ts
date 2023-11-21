@@ -1,3 +1,4 @@
+import { PrismaService } from './../prisma/prisma.service';
 import {
   BadRequestException,
   Injectable,
@@ -9,34 +10,47 @@ import {
   validatePassword,
   validateName,
 } from './validation.utils';
-import { LoginBody, SignupBody, User } from 'src/model/user.model';
+import { User } from 'src/model/user.model';
 
 @Injectable()
 export class UserService {
-  private users: User[] = [];
+  constructor(private prismaService: PrismaService) {}
 
-  signup(signupData: SignupBody) {
-    const { password, email, name } = signupData;
+  async signup(userData: User) {
+    const { password, email, name } = userData;
+    console.log(userData);
     if (!validateEmail(email))
-      throw new BadRequestException('please enter a valid email address.');
+      throw new BadRequestException('Please enter a valid email address.');
     if (!validatePassword(password))
-      throw new BadRequestException('please enter a valid password.');
+      throw new BadRequestException('Please enter a valid password.');
     if (!validateName(name))
-      throw new BadRequestException('please enter a valid name.');
-    this.users.push(signupData);
-    return { message: 'signup success' };
+      throw new BadRequestException('Please enter a valid name.');
+    try {
+      await this.prismaService.user1.create({ data: userData });
+    } catch (error) {
+      if (error.code === 'P2002') {
+        throw new BadRequestException('Email already exists.');
+      }
+    }
+    return { messege: 'signup success' };
   }
 
-  login(loginData: LoginBody) {
+  async login(loginData: { email: string; password: string }) {
     const { email, password } = loginData;
-    const currentUser = this.users.find((user) => user.email === email);
-    if (!currentUser) return new NotFoundException('email not found.');
+    const currentUser = await this.prismaService.user1.findUnique({
+      where: { email: String(email) },
+    });
+    if (!currentUser) return new NotFoundException('Email not found.');
     if (currentUser.password !== password)
-      return new UnauthorizedException('password is not correct');
-    return { message: 'login success' };
+      return new UnauthorizedException('Password is not correct');
+    return { messege: 'login success' };
   }
 
-  getRoot(): string {
+  async getAll() {
+    return await this.prismaService.user1.findMany();
+  }
+
+  getroot(): string {
     return 'root';
   }
 }
