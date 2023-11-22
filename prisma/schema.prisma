@@ -12,8 +12,8 @@ generator client {
 }
 
 
-model User1 { 
-  @@map(name: "user1") 
+model User { 
+  @@map(name: "user") 
   id String @unique @id @default(uuid())
   name String @db.VarChar(64) 
   email String @unique @db.VarChar(64) 

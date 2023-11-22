@@ -1,12 +1,13 @@
 import { UserService } from './user.service';
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { LoginBody, SignupBody } from 'src/model/user.model';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  getroot() {
+  getRoot() {
     return this.userService.getRoot();
   }
 
@@ -16,17 +17,17 @@ export class UserController {
   }
 
   @Post('signup')
-  postsignup(@Body() userData) {
+  postSignup(@Body() userData: SignupBody) {
     return this.userService.signup(userData);
   }
 
   @Post('login')
-  postlogin(@Body() loginData) {
+  postLogin(@Body() loginData: LoginBody) {
     return this.userService.login(loginData);
   }
 
   @Delete(':id')
-  deleteOneUser(@Param('id') uesrID) {
+  deleteOneUser(@Param('id') uesrID: string) {
     return this.userService.deleteOne(uesrID);
   }
 }

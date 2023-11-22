@@ -10,13 +10,13 @@ import {
   validatePassword,
   validateName,
 } from './validation.utils';
-import { LoginBody, User } from 'src/model/user.model';
+import { LoginBody, SignupBody } from 'src/model/user.model';
 
 @Injectable()
 export class UserService {
   constructor(private prismaService: PrismaService) {}
 
-  async signup(userData: User) {
+  async signup(userData: SignupBody) {
     const { password, email, name } = userData;
     if (!validateEmail(email))
       throw new BadRequestException('please enter a valid email address.');
@@ -25,7 +25,7 @@ export class UserService {
     if (!validateName(name))
       throw new BadRequestException('please enter a valid name.');
     try {
-      await this.prismaService.user1.create({ data: userData });
+      await this.prismaService.user.create({ data: userData });
     } catch (error) {
       if (error.code === 'P2002') {
         throw new BadRequestException('email already exists.');
@@ -36,7 +36,7 @@ export class UserService {
 
   async login(loginData: LoginBody) {
     const { email, password } = loginData;
-    const currentUser = await this.prismaService.user1.findUnique({
+    const currentUser = await this.prismaService.user.findUnique({
       where: { email: String(email) },
     });
     if (!currentUser) return new NotFoundException('email not found.');
@@ -46,11 +46,11 @@ export class UserService {
   }
 
   async getAll() {
-    return await this.prismaService.user1.findMany();
+    return await this.prismaService.user.findMany();
   }
 
   async deleteOne(id: string) {
-    return await this.prismaService.user1.delete({ where: { id: String(id) } });
+    return await this.prismaService.user.delete({ where: { id: String(id) } });
   }
 
   getRoot() {
