@@ -19,13 +19,5 @@ model User1 {
   email String @unique @db.VarChar(64) 
   password String @db.VarChar(64) 
 }
-model User2 { 
-  @@map(name: "user2") 
-  id String @unique @id @default(uuid())
-  id2 String? @unique @default(uuid())
-  name String @db.VarChar(64) 
-  email String @db.VarChar(64) 
-  password String @db.VarChar(64) 
-}
 
 

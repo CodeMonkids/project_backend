@@ -1,5 +1,5 @@
 import { UserService } from './user.service';
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 
 @Controller('user')
 export class UserController {
@@ -7,7 +7,7 @@ export class UserController {
 
   @Get()
   getroot() {
-    return this.userService.getroot();
+    return this.userService.getRoot();
   }
 
   @Get('alluser')
@@ -23,5 +23,10 @@ export class UserController {
   @Post('login')
   postlogin(@Body() loginData) {
     return this.userService.login(loginData);
+  }
+
+  @Delete(':id')
+  deleteOneUser(@Param('id') uesrID) {
+    return this.userService.deleteOne(uesrID);
   }
 }

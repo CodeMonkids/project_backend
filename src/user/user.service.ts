@@ -10,7 +10,7 @@ import {
   validatePassword,
   validateName,
 } from './validation.utils';
-import { User } from 'src/model/user.model';
+import { LoginBody, User } from 'src/model/user.model';
 
 @Injectable()
 export class UserService {
@@ -18,31 +18,30 @@ export class UserService {
 
   async signup(userData: User) {
     const { password, email, name } = userData;
-    console.log(userData);
     if (!validateEmail(email))
-      throw new BadRequestException('Please enter a valid email address.');
+      throw new BadRequestException('please enter a valid email address.');
     if (!validatePassword(password))
-      throw new BadRequestException('Please enter a valid password.');
+      throw new BadRequestException('please enter a valid password.');
     if (!validateName(name))
-      throw new BadRequestException('Please enter a valid name.');
+      throw new BadRequestException('please enter a valid name.');
     try {
       await this.prismaService.user1.create({ data: userData });
     } catch (error) {
       if (error.code === 'P2002') {
-        throw new BadRequestException('Email already exists.');
+        throw new BadRequestException('email already exists.');
       }
     }
     return { messege: 'signup success' };
   }
 
-  async login(loginData: { email: string; password: string }) {
+  async login(loginData: LoginBody) {
     const { email, password } = loginData;
     const currentUser = await this.prismaService.user1.findUnique({
       where: { email: String(email) },
     });
-    if (!currentUser) return new NotFoundException('Email not found.');
+    if (!currentUser) return new NotFoundException('email not found.');
     if (currentUser.password !== password)
-      return new UnauthorizedException('Password is not correct');
+      return new UnauthorizedException('password is not correct');
     return { messege: 'login success' };
   }
 
@@ -50,7 +49,11 @@ export class UserService {
     return await this.prismaService.user1.findMany();
   }
 
-  getroot(): string {
+  async deleteOne(id: string) {
+    return await this.prismaService.user1.delete({ where: { id: String(id) } });
+  }
+
+  getRoot() {
     return 'root';
   }
 }
