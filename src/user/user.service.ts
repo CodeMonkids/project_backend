@@ -9,8 +9,9 @@ import {
   validateEmail,
   validatePassword,
   validateName,
-} from './validation.utils';
+} from '../utils/validation.utils';
 import { LoginBody, SignupBody } from 'src/model/user.model';
+import { Messeges } from 'src/utils/messege.utils';
 
 @Injectable()
 export class UserService {
@@ -18,20 +19,20 @@ export class UserService {
 
   async signup(userData: SignupBody) {
     const { password, email, name } = userData;
-    if (!validateEmail(email))
-      throw new BadRequestException('please enter a valid email address.');
+    const { invalidEmail, invalidName, invalidPassword } =
+      Messeges.invaildError;
+    if (!validateEmail(email)) throw new BadRequestException(invalidEmail);
     if (!validatePassword(password))
-      throw new BadRequestException('please enter a valid password.');
-    if (!validateName(name))
-      throw new BadRequestException('please enter a valid name.');
+      throw new BadRequestException(invalidPassword);
+    if (!validateName(name)) throw new BadRequestException(invalidName);
     try {
       await this.prismaService.user.create({ data: userData });
     } catch (error) {
       if (error.code === 'P2002') {
-        throw new BadRequestException('email already exists.');
+        throw new BadRequestException(Messeges.already.email);
       }
     }
-    return { messege: 'signup success' };
+    return { messege: Messeges.success.signup };
   }
 
   async login(loginData: LoginBody) {
@@ -39,10 +40,10 @@ export class UserService {
     const currentUser = await this.prismaService.user.findUnique({
       where: { email: String(email) },
     });
-    if (!currentUser) return new NotFoundException('email not found.');
+    if (!currentUser) return new NotFoundException(Messeges.notFound.email);
     if (currentUser.password !== password)
-      return new UnauthorizedException('password is not correct');
-    return { messege: 'login success' };
+      return new UnauthorizedException(Messeges.correct.password);
+    return { messege: Messeges.success.login };
   }
 
   async getAll() {
