@@ -1,6 +1,6 @@
 import { UserService } from './user.service';
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { User } from '../model/user.model';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { LoginBody, SignupBody } from 'src/model/user.model';
 
 @Controller('user')
 export class UserController {
@@ -11,13 +11,23 @@ export class UserController {
     return this.userService.getRoot();
   }
 
+  @Get('alluser')
+  getAllusers() {
+    return this.userService.getAll();
+  }
+
   @Post('signup')
-  signup(@Body() userData: User) {
+  postSignup(@Body() userData: SignupBody) {
     return this.userService.signup(userData);
   }
 
   @Post('login')
-  login(@Body() loginData: User) {
+  postLogin(@Body() loginData: LoginBody) {
     return this.userService.login(loginData);
+  }
+
+  @Delete(':id')
+  deleteOneUser(@Param('id') uesrID: string) {
+    return this.userService.deleteOne(uesrID);
   }
 }

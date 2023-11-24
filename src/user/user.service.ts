@@ -1,3 +1,4 @@
+import { PrismaService } from './../prisma/prisma.service';
 import {
   BadRequestException,
   Injectable,
@@ -8,35 +9,52 @@ import {
   validateEmail,
   validatePassword,
   validateName,
-} from './validation.utils';
-import { LoginBody, SignupBody, User } from 'src/model/user.model';
+} from '../utils/validation.utils';
+import { LoginBody, SignupBody } from 'src/model/user.model';
+import { Messeges } from 'src/utils/messege.utils';
 
 @Injectable()
 export class UserService {
-  private users: User[] = [];
+  constructor(private prismaService: PrismaService) {}
 
-  signup(signupData: SignupBody) {
-    const { password, email, name } = signupData;
-    if (!validateEmail(email))
-      throw new BadRequestException('please enter a valid email address.');
+  async signup(userData: SignupBody) {
+    const { password, email, name } = userData;
+    const { invalidEmail, invalidName, invalidPassword } =
+      Messeges.invaildError;
+    if (!validateEmail(email)) throw new BadRequestException(invalidEmail);
     if (!validatePassword(password))
-      throw new BadRequestException('please enter a valid password.');
-    if (!validateName(name))
-      throw new BadRequestException('please enter a valid name.');
-    this.users.push(signupData);
-    return { message: 'signup success' };
+      throw new BadRequestException(invalidPassword);
+    if (!validateName(name)) throw new BadRequestException(invalidName);
+    try {
+      await this.prismaService.user.create({ data: userData });
+    } catch (error) {
+      if (error.code === 'P2002') {
+        throw new BadRequestException(Messeges.already.email);
+      }
+    }
+    return { messege: Messeges.success.signup };
   }
 
-  login(loginData: LoginBody) {
+  async login(loginData: LoginBody) {
     const { email, password } = loginData;
-    const currentUser = this.users.find((user) => user.email === email);
-    if (!currentUser) return new NotFoundException('email not found.');
+    const currentUser = await this.prismaService.user.findUnique({
+      where: { email: String(email) },
+    });
+    if (!currentUser) return new NotFoundException(Messeges.notFound.email);
     if (currentUser.password !== password)
-      return new UnauthorizedException('password is not correct');
-    return { message: 'login success' };
+      return new UnauthorizedException(Messeges.correct.password);
+    return { messege: Messeges.success.login };
   }
 
-  getRoot(): string {
+  async getAll() {
+    return await this.prismaService.user.findMany();
+  }
+
+  async deleteOne(id: string) {
+    return await this.prismaService.user.delete({ where: { id: String(id) } });
+  }
+
+  getRoot() {
     return 'root';
   }
 }
