@@ -1,23 +1,17 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+model User {
+  id       String @id @unique @default(uuid())
+  name     String @db.VarChar(64)
+  email    String @unique @db.VarChar(64)
+  password String @db.VarChar(64)
+
+  @@map("user")
 }
-
-
-model User { 
-  @@map(name: "user") 
-  id String @unique @id @default(uuid())
-  name String @db.VarChar(64) 
-  email String @unique @db.VarChar(64) 
-  password String @db.VarChar(64) 
-}
-
-
