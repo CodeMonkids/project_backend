@@ -5,45 +5,31 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import {
-  validateEmail,
-  validatePassword,
-  validateName,
-} from '../utils/validation.utils';
-import { LoginBody, SignupBody } from 'src/model/user.model';
+
+import { LoginBody, SignupBody } from '../auth/dto/auth.dto';
 import { Messeges } from 'src/utils/messege.utils';
 
 @Injectable()
 export class UserService {
   constructor(private prismaService: PrismaService) {}
 
-  async signup(userData: SignupBody) {
-    const { password, email, name } = userData;
-    const { invalidEmail, invalidName, invalidPassword } =
-      Messeges.invaildError;
-    if (!validateEmail(email)) throw new BadRequestException(invalidEmail);
-    if (!validatePassword(password))
-      throw new BadRequestException(invalidPassword);
-    if (!validateName(name)) throw new BadRequestException(invalidName);
+  async createOne(userData: SignupBody) {
     try {
       await this.prismaService.user.create({ data: userData });
     } catch (error) {
-      if (error.code === 'P2002') {
-        throw new BadRequestException(Messeges.already.email);
-      }
+      throw error;
     }
     return { messege: Messeges.success.signup };
   }
 
-  async login(loginData: LoginBody) {
-    const { email, password } = loginData;
+  async findOne(email: string) {
     const currentUser = await this.prismaService.user.findUnique({
       where: { email: String(email) },
     });
-    if (!currentUser) return new NotFoundException(Messeges.notFound.email);
-    if (currentUser.password !== password)
-      return new UnauthorizedException(Messeges.correct.password);
-    return { messege: Messeges.success.login };
+    if (!currentUser) {
+      return null;
+    }
+    return currentUser;
   }
 
   async getAll() {
